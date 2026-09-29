@@ -6,5 +6,9 @@ export function primaryImage(vehicle: VehicleWithImages) {
 }
 
 export function formatPrice(value: number) {
-  return `LKR ${new Intl.NumberFormat("en-LK", { maximumFractionDigits: 2 }).format(value)} / day`;
+  return `${formatAmount(value)} / day`;
+}
+
+export function formatAmount(value: number) {
+  return `LKR ${new Intl.NumberFormat("en-LK", { maximumFractionDigits: 2 }).format(value)}`;
 }

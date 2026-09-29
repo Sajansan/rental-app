@@ -1,5 +1,3 @@
-import { AccountPlaceholder } from "@/components/auth/account-placeholder";
-
-export default function CustomerPage() {
-  return <AccountPlaceholder role="customer" />;
-}
+import { redirect } from "next/navigation";
+import { requireRole } from "@/lib/auth";
+export default async function CustomerPage() { await requireRole("customer"); redirect("/my-bookings"); }

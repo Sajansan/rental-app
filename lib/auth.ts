@@ -3,12 +3,12 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { Profile, Role } from "@/types/profile";
+import type { SessionProfile, Role } from "@/types/profile";
 
 type Account =
   | { status: "anonymous" }
   | { status: "error"; message: string }
-  | { status: "authenticated"; profile: Profile };
+  | { status: "authenticated"; profile: SessionProfile };
 
 export const getAccount = cache(async (): Promise<Account> => {
   try {
@@ -31,7 +31,7 @@ export const getAccount = cache(async (): Promise<Account> => {
     if (profileError || !profile || !["admin", "customer"].includes(profile.role)) {
       return { status: "error", message: "Unable to load your profile. Please try again or contact support." };
     }
-    return { status: "authenticated", profile };
+    return { status: "authenticated", profile: { ...profile, email: user.email ?? null } };
   } catch {
     return { status: "error", message: "Unable to connect to the authentication service. Please try again." };
   }

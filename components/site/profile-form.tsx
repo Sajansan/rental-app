@@ -1,0 +1,7 @@
+"use client";
+import { useActionState } from "react";
+import { updateProfile, type ProfileActionState } from "@/app/profile/actions";
+export function ProfileForm({ name, phone, email }: { name: string; phone: string | null; email: string | null }) {
+  const [state, action, pending] = useActionState<ProfileActionState, FormData>(updateProfile, {});
+  return <form action={action} className="space-y-5 rounded-2xl border border-stone-200 bg-white p-6"><label className="block text-sm font-medium">Full name<input name="full_name" required minLength={2} maxLength={100} defaultValue={name} className="field mt-2"/></label><label className="block text-sm font-medium">Email address<input type="email" disabled value={email ?? ""} className="field mt-2 bg-stone-50 text-stone-500"/><span className="mt-1 block text-xs font-normal text-stone-500">Email changes are managed by your sign-in provider.</span></label><label className="block text-sm font-medium">Phone number<input name="phone" maxLength={40} defaultValue={phone ?? ""} className="field mt-2"/></label>{state.error&&<p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{state.error}</p>}{state.success&&<p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">{state.success}</p>}<button disabled={pending} className="rounded-xl bg-emerald-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">{pending?"Saving…":"Save profile"}</button></form>;
+}

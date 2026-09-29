@@ -1,14 +1,10 @@
 import Link from "next/link";
+import { VehicleSearch } from "@/components/site/vehicle-search";
+import { VehicleCard } from "@/components/site/vehicle-card";
+import { getVehicles, type VehicleWithImages } from "@/lib/vehicles";
 
-export default function Home() {
-  return (
-    <main className="mx-auto w-full max-w-2xl space-y-6 px-5 py-20">
-      <h1 className="text-4xl font-semibold tracking-tight">Car &amp; Van Rental</h1>
-      <p className="text-lg text-slate-600">Find and book your ideal vehicle.</p>
-      <div className="flex gap-3">
-        <Link href="/login" className="rounded-md bg-blue-700 px-5 py-2 text-white hover:bg-blue-800">Login</Link>
-        <Link href="/register" className="rounded-md border border-slate-300 px-5 py-2 hover:bg-slate-100">Register</Link>
-      </div>
-    </main>
-  );
+export default async function Home() {
+  let vehicles: VehicleWithImages[] = [];
+  try { vehicles = (await getVehicles()).filter((vehicle) => vehicle.status === "available").slice(0, 3); } catch { /* The page remains useful while Supabase is unavailable. */ }
+  return <main className="flex-1 site-page text-stone-950"><section className="relative overflow-hidden home-hero"><div className="absolute -right-24 -top-36 size-[34rem] rounded-full border border-white/10"/><div className="mx-auto grid max-w-7xl gap-10 px-5 pb-28 pt-20 md:grid-cols-[1.1fr_.9fr] md:items-center md:pb-36 md:pt-28"><div className="relative z-10"><p className="text-xs font-semibold uppercase tracking-[0.25em] text-blue-700">Roadly · Sri Lanka</p><h1 className="mt-5 max-w-2xl text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">Find the right vehicle for every journey.</h1><p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">Thoughtful car and van rentals for weekends away, daily drives and everything you need to move.</p><div className="mt-8 flex flex-wrap gap-3"><Link href="/vehicles" className="rounded-xl bg-emerald-400 px-5 py-3 font-semibold text-white hover:bg-emerald-300">Browse vehicles</Link><Link href="/login" className="rounded-xl border border-white/20 px-5 py-3 font-semibold hover:bg-white/10">Sign in</Link></div></div><div className="relative rounded-3xl bg-white/40 p-3 shadow-lg backdrop-blur-xl"><div className="rounded-2xl border border-white/10 bg-white p-6 text-stone-950"><p className="text-sm font-semibold">Plan your next drive</p><p className="mb-5 mt-1 text-sm text-stone-500">Choose dates to find available vehicles.</p><VehicleSearch compact /></div></div></div></section><section className="mx-auto max-w-7xl px-5 py-16 md:py-20"><div className="mb-8 flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-800">Ready when you are</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Vehicles for your plans</h2></div><Link href="/vehicles" className="text-sm font-semibold text-emerald-900">Explore all vehicles →</Link></div>{vehicles.length ? <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{vehicles.map((vehicle) => <VehicleCard key={vehicle.id} vehicle={vehicle} />)}</div> : <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center text-stone-600">Our fleet is being prepared. Check back soon or browse available vehicles.</div>}</section><section className="border-y border-stone-200 bg-white"><div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 md:grid-cols-3">{[["01", "Choose your vehicle", "Browse real vehicles and compare the details that matter."], ["02", "Send a request", "Pick your dates and tell us where you would like to collect."], ["03", "We confirm", "The rental team reviews your request and confirms your booking."]].map(([n, title, text]) => <div key={n}><p className="text-sm font-semibold text-emerald-800">{n}</p><h3 className="mt-3 text-lg font-semibold">{title}</h3><p className="mt-2 text-sm leading-6 text-stone-500">{text}</p></div>)}</div></section></main>;
 }

@@ -1,16 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { Navbar } from "@/components/site/navbar";
 
 export const metadata: Metadata = {
   title: "Car & Van Rental",
@@ -19,11 +9,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: `try{document.documentElement.dataset.theme=localStorage.getItem("roadly-theme")==="dark"?"dark":"light"}catch{document.documentElement.dataset.theme="light"}` }} /></head>
+      <body className="min-h-full flex flex-col"><Navbar />{children}<footer className="site-footer mt-auto border-t"><div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-7 text-sm"><span>© {new Date().getFullYear()} Roadly Rentals</span><span>Clear pricing. Reliable journeys.</span></div></footer></body>
     </html>
   );
 }

@@ -89,14 +89,14 @@ function form(extra = {}) {
   return data;
 }
 
-test('signup ignores a forged role and relies on the existing trigger', async () => {
+test('signup ignores a forged role and reports when confirmation blocks an immediate session', async () => {
   let payload;
   const service = actions({ auth: { signUp: async (value) => {
     payload = value;
     return { data: { session: null }, error: null };
   } } });
   const result = await service.register({}, form({ role: 'admin' }));
-  assert.match(result.success, /verify/);
+  assert.match(result.error, /Turn off Confirm email/);
   assert.equal(JSON.stringify(payload.options.data), JSON.stringify({ full_name: 'Test User', phone: '123' }));
 });
 
@@ -112,7 +112,7 @@ test('immediate signup sessions and successful logins redirect using the profile
 });
 
 test('login handles invalid credentials, unconfirmed email, network and missing profile errors', async () => {
-  for (const [code, message] of [['invalid_credentials', /Invalid email/], ['email_not_confirmed', /verify your email/]]) {
+  for (const [code, message] of [['invalid_credentials', /Invalid email/], ['email_not_confirmed', /Turn off Confirm email/]]) {
     const result = await actions({ auth: { signInWithPassword: async () => ({ error: { code } }) } }).login({}, form());
     assert.match(result.error, message);
   }
@@ -127,4 +127,3 @@ test('logout redirects only after successful signOut', async () => {
   const result = await actions({ auth: { signOut: async () => ({ error: {} }) } }).logout();
   assert.match(result.error, /Unable to log out/);
 });
-
