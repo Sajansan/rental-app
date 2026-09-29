@@ -11,6 +11,34 @@ function field(form: FormData, name: string) {
   return typeof value === "string" ? value : "";
 }
 
+function loginErrorMessage(error: { code?: string; status?: number; name?: string }) {
+  if (error.code === "invalid_credentials") return "Invalid email or password.";
+  if (error.code === "email_not_confirmed") return "Supabase is still requiring email confirmation. Turn off Confirm email in Authentication → Providers → Email to allow direct sign-in.";
+  if (error.code === "user_banned") return "This account is disabled. Please contact support.";
+  if (error.code === "email_address_not_authorized") return "This email address is not allowed to sign in to this Supabase project.";
+  if (error.code === "over_request_rate_limit" || error.status === 429) return "Too many sign-in attempts. Wait a few minutes and try again.";
+  if (error.code === "request_timeout" || error.name === "AuthRetryableFetchError" || (error.status !== undefined && error.status >= 500)) {
+    return "Supabase Auth is temporarily unavailable. Check your connection and try again.";
+  }
+  return "Supabase could not complete sign-in. Check the server terminal for the auth error code and status.";
+}
+
+function registrationErrorMessage(error: { code?: string; status?: number; name?: string }) {
+  if (error.code === "user_already_exists" || error.code === "email_exists") return "An account with this email already exists. Try signing in instead.";
+  if (error.code === "weak_password") return "Please choose a stronger password.";
+  if (error.code === "signup_disabled") return "New account registration is disabled in Supabase Auth.";
+  if (error.code === "email_provider_disabled") return "Email and password sign-up is disabled in Supabase Auth.";
+  if (error.code === "email_address_not_authorized") return "This email address is not allowed by the Supabase project's email provider settings.";
+  if (error.code === "over_request_rate_limit" || error.code === "over_email_send_rate_limit" || error.status === 429) {
+    return "Too many sign-up attempts. Wait a few minutes and try again.";
+  }
+  if (error.code === "captcha_failed") return "The sign-up verification failed. Refresh the page and try again.";
+  if (error.code === "unexpected_failure" || (error.status !== undefined && error.status >= 500)) {
+    return "Supabase Auth could not create the account. Check the Supabase Auth logs and the existing profile-creation trigger.";
+  }
+  return "Supabase could not complete registration. Check the server terminal for the auth error code and status.";
+}
+
 async function finishLogin(): Promise<AuthState> {
   const account = await getAccount();
   if (account.status === "error") return { error: account.message };
@@ -28,11 +56,12 @@ export async function login(_previous: AuthState, form: FormData): Promise<AuthS
     const supabase = await createClient(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      if (error.code === "invalid_credentials") return { error: "Invalid email or password." };
-      if (error.code === "email_not_confirmed") return { error: "Please verify your email before signing in." };
-      return { error: "Unable to sign in. Please try again shortly." };
+      // Codes/status only: never write the submitted email/password or access tokens to logs.
+      console.error("Supabase sign-in failed", { code: error.code, status: error.status, name: error.name });
+      return { error: loginErrorMessage(error) };
     }
   } catch {
+    console.error("Supabase sign-in request failed before an auth response was received.");
     return { error: "Unable to connect. Please try again." };
   }
   return finishLogin();
@@ -54,12 +83,14 @@ export async function register(_previous: AuthState, form: FormData): Promise<Au
       options: { data: { full_name, phone: phone || null } },
     });
     if (error) {
-      if (error.code === "user_already_exists") return { error: "Unable to create account. Try signing in instead." };
-      if (error.code === "weak_password") return { error: "Please choose a stronger password." };
-      return { error: "Unable to create account. Please try again shortly." };
+      // Auth errors may include account-creation trigger or provider configuration failures.
+      // Log only diagnostic metadata, never user data or credentials.
+      console.error("Supabase sign-up failed", { code: error.code, status: error.status, name: error.name });
+      return { error: registrationErrorMessage(error) };
     }
-    if (!data.session) return { success: "Check your email to verify your account, then sign in. If you already have an account, sign in instead." };
+    if (!data.session) return { error: "Supabase created the account but did not start a login session. Turn off Confirm email in Authentication → Providers → Email to register and sign in directly." };
   } catch {
+    console.error("Supabase sign-up request failed before an auth response was received.");
     return { error: "Unable to connect. Please try again." };
   }
   return finishLogin();

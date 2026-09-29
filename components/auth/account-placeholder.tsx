@@ -14,6 +14,7 @@ export async function AccountPlaceholder({ role }: { role: Role }) {
         <p className="text-lg">Welcome, {profile.full_name}</p>
         <p className="text-slate-600">Role: {label}</p>
       </div>
+      {role === "admin" && <Link href="/admin/vehicles" className="inline-block rounded bg-blue-700 px-4 py-2 text-white">Manage Vehicles</Link>}
       <LogoutButton />
     </main>
   );
