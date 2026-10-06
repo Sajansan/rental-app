@@ -45,7 +45,7 @@ export type Booking = {
   return_date: string;
   price_per_day: number;
   total_price: number;
-  pickup_location: string;
+  pickup_location: string | null;
   status: BookingStatus;
   notes: string | null;
   created_at: string;
@@ -57,7 +57,7 @@ export type Payment = {
   booking_id: string;
   user_id: string;
   amount: number;
-  payment_method: "cash" | "bank_transfer";
+  payment_method: "cash" | "bank_transfer" | null;
   status: "pending" | "paid" | "failed";
   paid_at: string | null;
   created_at: string;
@@ -65,7 +65,7 @@ export type Payment = {
 
 export type SessionProfile = Profile & { email: string | null };
 
-// Only the existing table used in Phase 1 is modeled here.
+// Matches the existing Supabase public tables; changes here do not alter the database.
 export type Database = {
   public: {
     Tables: {

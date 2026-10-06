@@ -55,6 +55,9 @@ export async function deleteVehicle(id: string) {
   await requireRole("admin");
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) return { error: "Invalid vehicle ID." };
   const supabase = await createClient(true);
+  const { count: bookingCount, error: bookingError } = await supabase.from("bookings").select("id", { count: "exact", head: true }).eq("vehicle_id", id);
+  if (bookingError) return { error: "Unable to check this vehicle's booking history. Please try again." };
+  if (bookingCount) return { error: "This vehicle has booking history. Set it to inactive to keep its records and images." };
   const { data: images, error: imageError } = await supabase.from("vehicle_images").select("image_url").eq("vehicle_id", id);
   if (imageError) return { error: "Unable to check the vehicle's image files. The vehicle was not deleted." };
   const paths = (images ?? []).map((image) => publicStoragePath(image.image_url));

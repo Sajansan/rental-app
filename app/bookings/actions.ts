@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { checkAvailability, rentalDays } from "@/lib/bookings";
 import { createClient } from "@/lib/supabase/server";
+import { todayInSriLanka } from "@/lib/dates";
 
 export type BookingActionState = { error?: string };
 export async function createBooking(_state: BookingActionState, form: FormData): Promise<BookingActionState> {
@@ -17,7 +18,7 @@ export async function createBooking(_state: BookingActionState, form: FormData):
   const days = rentalDays(pickupDate, returnDate);
   if (!/^[0-9a-f-]{36}$/i.test(vehicleId)) return { error: "Select a valid vehicle." };
   if (!days) return { error: "Choose a valid return date after your pickup date." };
-  if (pickupDate < new Date().toISOString().slice(0, 10)) return { error: "Pickup date cannot be in the past." };
+  if (pickupDate < todayInSriLanka()) return { error: "Pickup date cannot be in the past." };
   if (pickupLocation.length < 2 || pickupLocation.length > 160) return { error: "Enter a pickup location (2–160 characters)." };
   if (notes.length > 1000) return { error: "Notes must be 1,000 characters or fewer." };
   const supabase = await createClient(true);

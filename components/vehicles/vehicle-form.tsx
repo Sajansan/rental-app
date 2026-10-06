@@ -5,13 +5,13 @@ import type { Vehicle } from "@/types/profile";
 import { createVehicle, updateVehicle } from "@/app/admin/vehicles/actions";
 
 type FormState = { error?: string };
-const input = "mt-1 w-full rounded-md border border-slate-300 px-3 py-2";
+const input = "field mt-2";
 
 export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
   const action = vehicle ? updateVehicle : createVehicle;
   const [state, formAction, pending] = useActionState<FormState, FormData>(action, {});
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="space-y-5 rounded-2xl border border-stone-200 bg-white p-5 sm:p-7">
       {vehicle && <input type="hidden" name="id" value={vehicle.id} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="text-sm font-medium">Vehicle Name<input className={input} name="name" required maxLength={120} defaultValue={vehicle?.name ?? ""} /></label>
@@ -28,7 +28,7 @@ export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
       </div>
       <label className="block text-sm font-medium">Description<textarea className={input} name="description" rows={4} maxLength={4000} defaultValue={vehicle?.description ?? ""} /></label>
       {state.error && <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-800">{state.error}</p>}
-      <button disabled={pending} className="rounded bg-blue-700 px-4 py-2 text-white disabled:opacity-60">{pending ? "Saving…" : vehicle ? "Save changes" : "Create vehicle"}</button>
+      <button disabled={pending} className="button-primary disabled:opacity-60">{pending ? "Saving…" : vehicle ? "Save changes" : "Create vehicle"}</button>
     </form>
   );
 }

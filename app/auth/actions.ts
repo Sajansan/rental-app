@@ -13,14 +13,14 @@ function field(form: FormData, name: string) {
 
 function loginErrorMessage(error: { code?: string; status?: number; name?: string }) {
   if (error.code === "invalid_credentials") return "Invalid email or password.";
-  if (error.code === "email_not_confirmed") return "Supabase is still requiring email confirmation. Turn off Confirm email in Authentication → Providers → Email to allow direct sign-in.";
+  if (error.code === "email_not_confirmed") return "Please confirm your email before signing in. Check your inbox for the confirmation link.";
   if (error.code === "user_banned") return "This account is disabled. Please contact support.";
   if (error.code === "email_address_not_authorized") return "This email address is not allowed to sign in to this Supabase project.";
   if (error.code === "over_request_rate_limit" || error.status === 429) return "Too many sign-in attempts. Wait a few minutes and try again.";
   if (error.code === "request_timeout" || error.name === "AuthRetryableFetchError" || (error.status !== undefined && error.status >= 500)) {
-    return "Supabase Auth is temporarily unavailable. Check your connection and try again.";
+    return "Sign-in is temporarily unavailable. Please try again.";
   }
-  return "Supabase could not complete sign-in. Check the server terminal for the auth error code and status.";
+  return "Unable to sign in right now. Please try again.";
 }
 
 function registrationErrorMessage(error: { code?: string; status?: number; name?: string }) {
@@ -34,9 +34,9 @@ function registrationErrorMessage(error: { code?: string; status?: number; name?
   }
   if (error.code === "captcha_failed") return "The sign-up verification failed. Refresh the page and try again.";
   if (error.code === "unexpected_failure" || (error.status !== undefined && error.status >= 500)) {
-    return "Supabase Auth could not create the account. Check the Supabase Auth logs and the existing profile-creation trigger.";
+    return "Unable to create your account right now. Please try again or contact support.";
   }
-  return "Supabase could not complete registration. Check the server terminal for the auth error code and status.";
+  return "Unable to register right now. Please try again.";
 }
 
 async function finishLogin(): Promise<AuthState> {
@@ -88,7 +88,7 @@ export async function register(_previous: AuthState, form: FormData): Promise<Au
       console.error("Supabase sign-up failed", { code: error.code, status: error.status, name: error.name });
       return { error: registrationErrorMessage(error) };
     }
-    if (!data.session) return { error: "Supabase created the account but did not start a login session. Turn off Confirm email in Authentication → Providers → Email to register and sign in directly." };
+    if (!data.session) return { success: "Check your inbox to confirm your email, then sign in to your account." };
   } catch {
     console.error("Supabase sign-up request failed before an auth response was received.");
     return { error: "Unable to connect. Please try again." };

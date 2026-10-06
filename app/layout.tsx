@@ -3,8 +3,8 @@ import "./globals.css";
 import { Navbar } from "@/components/site/navbar";
 
 export const metadata: Metadata = {
-  title: "Car & Van Rental",
-  description: "Find and book your ideal vehicle.",
+  title: { default: "Roadly · Car & Van Rentals", template: "%s · Roadly" },
+  description: "Find your next drive in Sri Lanka. Compare cars and vans, choose your dates and track your booking with Roadly.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
