@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { createClient as createAuthClient } from "@supabase/supabase-js";
+import { getSupabaseConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/client";
 import { PasswordField } from "./password-field";
 
@@ -12,20 +14,32 @@ export function PasswordRecovery({ mode }: { mode: "request" | "reset" }) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const verification = useRef<Promise<void> | null>(null);
 
   useEffect(() => {
     if (mode !== "reset") return;
-    let active = true;
     async function verifyRecovery() {
-      try {
-        // Dashboard recovery emails use a URL fragment; SDK requests use PKCE.
+        // Recovery emails use fragments; older SDK links may arrive via PKCE.
         // Remove fragment credentials before creating a client or following links.
         const fragment = new URLSearchParams(window.location.hash.slice(1));
         const accessToken = fragment.get("access_token");
         const refreshToken = fragment.get("refresh_token");
+        const query = new URLSearchParams(window.location.search);
+        const tokenHash = query.get("token_hash");
+        const tokenType = query.get("type");
+        if (tokenHash) {
+          query.delete("token_hash");
+          query.delete("type");
+          window.history.replaceState(null, "", window.location.pathname + (query.size ? `?${query}` : "") + window.location.hash);
+        }
         if (window.location.hash) window.history.replaceState(null, "", window.location.pathname + window.location.search);
         const supabase = createClient();
-        if (fragment.has("error") || fragment.has("error_code")) throw new Error(invalidLink);
+        if (query.has("error") || fragment.has("error") || fragment.has("error_code")) throw new Error(invalidLink);
+        if (tokenHash) {
+          if (tokenType !== "recovery") throw new Error(invalidLink);
+          const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" });
+          if (error) throw new Error(invalidLink);
+        }
         if (accessToken || refreshToken) {
           if (!accessToken || !refreshToken || fragment.get("type") !== "recovery") throw new Error(invalidLink);
           const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
@@ -34,12 +48,11 @@ export function PasswordRecovery({ mode }: { mode: "request" | "reset" }) {
         // getUser validates the session with Auth before showing the password form.
         const { data, error } = await supabase.auth.getUser();
         if (error || !data.user) throw new Error(invalidLink);
-        if (active) setReady(true);
-      } catch {
-        if (active) setError(invalidLink);
-      }
     }
-    void verifyRecovery();
+    let active = true;
+    // Consume a single-use recovery link once, including in React Strict Mode.
+    verification.current ??= verifyRecovery();
+    void verification.current.then(() => { if (active) setReady(true); }).catch(() => { if (active) setError(invalidLink); });
     return () => { active = false; };
   }, [mode]);
 
@@ -52,14 +65,17 @@ export function PasswordRecovery({ mode }: { mode: "request" | "reset" }) {
     try {
       const supabase = createClient();
       if (mode === "request") {
-        const { error } = await supabase.auth.resetPasswordForEmail(String(values.get("email") ?? "").trim(), {
+        // Recovery emails can be opened in another browser without a PKCE cookie.
+        const { url, key } = getSupabaseConfig();
+        const recovery = createAuthClient(url, key, { auth: { storageKey: "roadly-recovery-request", flowType: "implicit", persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+        const { error } = await recovery.auth.resetPasswordForEmail(String(values.get("email") ?? "").trim(), {
           redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) {
           setError(error.status === 429 ? "Too many requests. Wait a few minutes and try again." : "Unable to send a recovery email. Please try again later.");
           return;
         }
-        setSuccess("If an account exists for this email, you’ll receive a password recovery link. Check your inbox and spam folder, and open the link in this browser.");
+        setSuccess("If an account exists for this email, you’ll receive a password recovery link. Check your inbox and spam folder, and use the newest email.");
       } else {
         const password = String(values.get("password") ?? "");
         if (password.length < 12) { setError("Use at least 12 characters for your new password."); return; }

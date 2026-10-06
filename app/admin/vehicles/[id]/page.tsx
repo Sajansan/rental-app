@@ -5,6 +5,7 @@ import { VehicleGallery } from "@/components/vehicles/vehicle-gallery";
 import { VehicleImageUploader } from "@/components/vehicles/vehicle-image-uploader";
 import { VehicleMetadata } from "@/components/vehicles/vehicle-metadata";
 import { DeleteVehicleButton } from "@/components/vehicles/vehicle-mutations";
+import { WorkspaceHeading } from "@/components/site/workspace-ui";
 
 export default async function VehicleDetailsPage({ params }: PageProps<"/admin/vehicles/[id]">) {
   const { id } = await params;
@@ -13,9 +14,8 @@ export default async function VehicleDetailsPage({ params }: PageProps<"/admin/v
   try { vehicle = await getVehicle(id); } catch { throw new Error("Unable to load vehicle details. Please refresh and try again."); }
   if (!vehicle) notFound();
   return <main className="space-y-7">
-    <Link href="/admin/vehicles" className="text-sm text-blue-700 underline">← Back to vehicles</Link>
-    <div className="flex flex-wrap items-start justify-between gap-3"><div><h1 className="text-3xl font-semibold">{vehicle.name}</h1><p className="text-slate-600">{vehicle.brand} {vehicle.model}</p></div><div className="flex gap-3"><Link className="rounded border px-3 py-2" href={`/admin/vehicles/${id}/edit`}>Edit Vehicle</Link><DeleteVehicleButton id={id} name={vehicle.name} /></div></div>
+    <WorkspaceHeading eyebrow="Fleet management" title={vehicle.name} description={`${vehicle.brand} ${vehicle.model ?? ""} · ${vehicle.registration_number}`} action={<div className="flex items-center gap-4"><Link className="button-primary" href={`/admin/vehicles/${id}/edit`}>Edit vehicle</Link><DeleteVehicleButton id={id} name={vehicle.name} /></div>} />
     <VehicleMetadata vehicle={vehicle} />
-    <section className="space-y-4"><h2 className="text-xl font-semibold">Vehicle Images ({vehicle.images.length}/5)</h2><VehicleGallery vehicleId={id} images={vehicle.images} /><VehicleImageUploader vehicleId={id} imageCount={vehicle.images.length} /></section>
+    <section className="workspace-panel p-6 space-y-5"><div><h2 className="text-lg font-semibold">Vehicle photos <span className="workspace-count ml-2">{vehicle.images.length}/5</span></h2><p className="mt-2 text-xs text-stone-500">Choose a primary photo and manage the images customers see.</p></div><VehicleGallery vehicleId={id} images={vehicle.images} /><VehicleImageUploader vehicleId={id} imageCount={vehicle.images.length} /></section>
   </main>;
 }

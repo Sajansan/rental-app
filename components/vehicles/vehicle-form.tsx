@@ -11,7 +11,8 @@ export function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
   const action = vehicle ? updateVehicle : createVehicle;
   const [state, formAction, pending] = useActionState<FormState, FormData>(action, {});
   return (
-    <form action={formAction} className="space-y-5 rounded-2xl border border-stone-200 bg-white p-5 sm:p-7">
+    <form action={formAction} className="workspace-panel space-y-6 p-5 sm:p-8">
+      <div className="workspace-form-heading"><h2>Vehicle details</h2><p>Required fields help customers choose the right vehicle.</p></div>
       {vehicle && <input type="hidden" name="id" value={vehicle.id} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="text-sm font-medium">Vehicle Name<input className={input} name="name" required maxLength={120} defaultValue={vehicle?.name ?? ""} /></label>

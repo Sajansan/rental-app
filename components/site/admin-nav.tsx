@@ -12,5 +12,5 @@ const links = [
 ] as const;
 export function AdminNav() {
   const pathname = usePathname();
-  return <nav aria-label="Admin workspace" className="flex gap-2 overflow-x-auto lg:flex-col">{links.map(link => <Link key={link.href} href={link.href} aria-current={(link.href === "/admin" ? pathname === link.href : pathname.startsWith(link.href)) ? "page" : undefined} className="admin-nav-link whitespace-nowrap rounded-xl px-3 py-3 text-sm font-medium"><Icon name={link.icon}/>{link.label}</Link>)}</nav>;
+  return <nav aria-label="Admin workspace" className="admin-nav">{links.map(link => <Link key={link.href} href={link.href} aria-current={(link.href === "/admin" ? pathname === link.href : pathname.startsWith(link.href)) ? "page" : undefined} className="admin-nav-link"><Icon name={link.icon}/><span>{link.label}</span><span className="admin-active-dot" aria-hidden="true" /></Link>)}</nav>;
 }
