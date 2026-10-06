@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { login, register } from "@/app/auth/actions";
 import type { AuthState } from "@/lib/auth-validation";
+import { PasswordField } from "./password-field";
 
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const isRegister = mode === "register";
@@ -23,16 +24,13 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         <label className="block text-sm font-medium" htmlFor="email">Email
           <input className={inputClass} id="email" name="email" type="email" autoComplete="email" required />
         </label>
-        <label className="block text-sm font-medium" htmlFor="password">Password
-          <input className={inputClass} id="password" name="password" type="password" autoComplete={isRegister ? "new-password" : "current-password"} minLength={isRegister ? 6 : undefined} required />
-        </label>
-        {isRegister && <label className="block text-sm font-medium" htmlFor="confirm_password">Confirm Password
-          <input className={inputClass} id="confirm_password" name="confirm_password" type="password" autoComplete="new-password" minLength={6} required />
-        </label>}
+        <PasswordField label="Password" id="password" name="password" autoComplete={isRegister ? "new-password" : "current-password"} minLength={isRegister ? 6 : undefined} required />
+        {isRegister && <PasswordField label="Confirm password" id="confirm_password" name="confirm_password" autoComplete="new-password" minLength={6} required />}
         <button className="w-full rounded-xl bg-emerald-900 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-wait" type="submit" disabled={pending || !!state.success}>
           {pending ? (isRegister ? "Creating account…" : "Signing in…") : (isRegister ? "Create account" : "Login")}
         </button>
       </fieldset>
+      {!isRegister && <Link href="/forgot-password" className="block text-right text-sm font-semibold text-emerald-900 underline">Forgot password?</Link>}
       {state.error && <p role="alert" className="rounded-md bg-red-50 p-3 text-sm text-red-800">{state.error}</p>}
       {state.success && <p role="status" className="rounded-md bg-green-50 p-3 text-sm text-green-800">{state.success}</p>}
       <p className="text-center text-sm text-stone-600">
