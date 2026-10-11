@@ -24,7 +24,7 @@ export function PasswordField({ id, label, className = "field", disabled, ...pro
           aria-pressed={visible}
           title={toggleLabel}
           onClick={() => setVisible((current) => !current)}
-          className="absolute inset-y-0 right-1 flex w-11 items-center justify-center rounded-lg text-stone-500 transition hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed"
+          className="absolute inset-y-0 right-1 flex w-11 items-center justify-center rounded-lg text-stone-500 transition hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />

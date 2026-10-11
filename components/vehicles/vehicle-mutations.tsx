@@ -37,7 +37,7 @@ export function ImageActions({ vehicleId, imageId, isPrimary }: { vehicleId: str
     });
   };
   return <div className="space-y-2">
-    {isPrimary ? <span className="text-sm font-medium text-green-800">Primary image</span> : <button disabled={pending} onClick={() => perform("primary")} className="text-sm text-blue-700 underline">{pending ? "Saving…" : "Set as primary"}</button>}
+    {isPrimary ? <span className="text-sm font-medium text-blue-800">Primary image</span> : <button disabled={pending} onClick={() => perform("primary")} className="text-sm text-blue-700 underline">{pending ? "Saving…" : "Set as primary"}</button>}
     <button disabled={pending} onClick={() => perform("delete")} className="ml-3 text-sm text-red-700 underline">{pending ? "Working…" : "Delete image"}</button>
     {error && <p className="text-xs text-red-700" role="alert">{error}</p>}
   </div>;

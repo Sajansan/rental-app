@@ -26,16 +26,16 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         </label>
         <PasswordField label="Password" id="password" name="password" autoComplete={isRegister ? "new-password" : "current-password"} minLength={isRegister ? 6 : undefined} required />
         {isRegister && <PasswordField label="Confirm password" id="confirm_password" name="confirm_password" autoComplete="new-password" minLength={6} required />}
-        <button className="w-full rounded-xl bg-emerald-900 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-wait" type="submit" disabled={pending || !!state.success}>
+        <button className="w-full rounded-xl bg-blue-900 px-4 py-3 font-semibold text-white transition hover:bg-blue-800 disabled:cursor-wait" type="submit" disabled={pending || !!state.success}>
           {pending ? (isRegister ? "Creating account…" : "Signing in…") : (isRegister ? "Create account" : "Login")}
         </button>
       </fieldset>
-      {!isRegister && <Link href="/forgot-password" className="block text-right text-sm font-semibold text-emerald-900 underline">Forgot password?</Link>}
+      {!isRegister && <Link href="/forgot-password" className="block text-right text-sm font-semibold text-blue-900 underline">Forgot password?</Link>}
       {state.error && <p role="alert" className="rounded-md bg-red-50 p-3 text-sm text-red-800">{state.error}</p>}
-      {state.success && <p role="status" className="rounded-md bg-green-50 p-3 text-sm text-green-800">{state.success}</p>}
+      {state.success && <p role="status" className="rounded-md bg-blue-50 p-3 text-sm text-blue-800">{state.success}</p>}
       <p className="text-center text-sm text-stone-600">
         {isRegister ? "Already have an account? " : "Need an account? "}
-        <Link className="font-semibold text-emerald-900 underline" href={isRegister ? "/login" : "/register"}>{isRegister ? "Sign in" : "Create an account"}</Link>
+        <Link className="font-semibold text-blue-900 underline" href={isRegister ? "/login" : "/register"}>{isRegister ? "Sign in" : "Create an account"}</Link>
       </p>
     </form>
   );

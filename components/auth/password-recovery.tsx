@@ -100,9 +100,9 @@ export function PasswordRecovery({ mode }: { mode: "request" | "reset" }) {
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 items-center px-5 py-12">
-      <section className="w-full rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-9">
-        <Link href="/login" className="text-sm font-semibold text-emerald-900">← Back to sign in</Link>
-        <p className="mt-8 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-800">Account recovery</p>
+      <section className="auth-glass w-full rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-9">
+        <Link href="/login" className="text-sm font-semibold text-blue-900">← Back to sign in</Link>
+        <p className="mt-8 text-xs font-semibold uppercase tracking-[0.2em] text-blue-800">Account recovery</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">{mode === "request" ? "Forgot your password?" : "Set a new password"}</h1>
         <p className="mb-6 mt-2 text-sm text-stone-600">{mode === "request" ? "We’ll email you a secure link to reset your password." : "Choose a strong password you haven’t used before."}</p>
         {mode === "reset" && !ready && !error && <p role="status" className="text-sm text-stone-600">Checking your recovery link…</p>}
@@ -115,12 +115,12 @@ export function PasswordRecovery({ mode }: { mode: "request" | "reset" }) {
               <p id="password-hint" className="text-xs text-stone-600">Use at least 12 characters. A unique passphrase works well.</p>
               <PasswordField label="Confirm new password" id="confirm-password" name="confirmation" autoComplete="new-password" required minLength={12} />
             </>}
-            <button type="submit" disabled={pending} className="w-full rounded-xl bg-emerald-900 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-wait">{pending ? "Please wait…" : mode === "request" ? "Send recovery link" : "Update password"}</button>
+            <button type="submit" disabled={pending} className="w-full rounded-xl bg-blue-900 px-4 py-3 font-semibold text-white transition hover:bg-blue-800 disabled:cursor-wait">{pending ? "Please wait…" : mode === "request" ? "Send recovery link" : "Update password"}</button>
           </fieldset>
         </form>}
         {error && <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-800">{error}</p>}
-        {success && <p role="status" className="mt-4 rounded-xl bg-green-50 p-3 text-sm text-green-800">{success}</p>}
-        {mode === "reset" && <Link href={success ? "/login" : "/forgot-password"} className="mt-5 inline-block text-sm font-semibold text-emerald-900 underline">{success ? "Sign in" : "Request a new recovery link"}</Link>}
+        {success && <p role="status" className="mt-4 rounded-xl bg-blue-50 p-3 text-sm text-blue-800">{success}</p>}
+        {mode === "reset" && <Link href={success ? "/login" : "/forgot-password"} className="mt-5 inline-block text-sm font-semibold text-blue-900 underline">{success ? "Sign in" : "Request a new recovery link"}</Link>}
       </section>
     </main>
   );
